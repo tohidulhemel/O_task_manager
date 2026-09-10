@@ -53,37 +53,62 @@ class _LoginScreenState extends State<LoginScreen> {
                 decoration: InputDecoration(hintText: 'Password'),
               ),
 
-              SizedBox(height: 20),
+              SizedBox(height: 20), 
 
-              FilledButton(
-                onPressed: () async {
-                  final ApiResponse response = await ApiCaller.postRequest(
-                    url: TMUrls.LoginURL,
-                    body: {
-                      "email": emailController.text,
-                      "password": passwordController.text,
-                    },
-                  );
+FilledButton(
+  onPressed: () async {
+    // Check empty fields first
+    if (emailController.text.trim().isEmpty ||
+        passwordController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please enter email and password'),
+        ),
+      );
+      return;
+    }
 
-                  if (response.isSuccess) {
-                    UserModel model = UserModel.fromJson(
-                      response.responseData['data'],
-                    );
-                    String token = response.responseData['token'];
+    final ApiResponse response = await ApiCaller.postRequest(
+      url: TMUrls.LoginURL,
+      body: {
+        "email": emailController.text.trim(),
+        "password": passwordController.text,
+      },
+    );
 
-                    AuthController.saveUserData(model, token);
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(builder: (context) => MainNavScreen()),
-                    );
-                  }
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (context) => MainNavScreen()),
-                  );
-                },
-                child: Icon(Icons.arrow_forward_ios_sharp, size: 20),
-              ),
+    if (response.isSuccess) {
+      UserModel model = UserModel.fromJson(
+        response.responseData['data'],
+      );
+
+      String token = response.responseData['token'];
+
+      await AuthController.saveUserData(model, token);
+
+      if (!mounted) return;
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const MainNavScreen(),
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            response.responseData['message'] ?? 'Login failed',
+          ),
+        ),
+      );
+    }
+  },
+  child: const Icon(
+    Icons.arrow_forward_ios_sharp,
+    size: 20,
+  ),
+),
+
 
               SizedBox(height: 70),
               Center(

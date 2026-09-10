@@ -35,11 +35,23 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
     if (response.isSuccess) {
       Navigator.pushReplacement(
+        // ignore: use_build_context_synchronously
         context,
         MaterialPageRoute(builder: (context) => LoginScreen()),
       );
     }
   }
+
+void onTapSignIn() {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const LoginScreen(),
+      ),
+    );
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -79,6 +91,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 SizedBox(height: 25),
                 TextFormField(
                   controller: lastNameController,
+                
                   decoration: InputDecoration(hintText: 'Last name'),
                 ),
                 SizedBox(height: 25),
@@ -106,27 +119,26 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 Center(
                   child: Column(
                     children: [
-                      RichText(
-                        text: TextSpan(
-                          text: "Already have an account ?",
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.w500,
-                          ),
-                          children: [
-                            TextSpan(
-                              text: ' Sign In',
-                              style: TextStyle(
-                                color: Colors.green,
-                                fontWeight: FontWeight.bold,
-                              ),
-
-                              recognizer: TapGestureRecognizer()
-                                ..onTap = onTapSignUP,
-                            ),
-                          ],
+                     RichText(
+                      text: TextSpan(
+                        text: "Already have an account ?",
+                        style: const TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.w500,
                         ),
+                        children: [
+                          TextSpan(
+                            text: ' Sign In',
+                            style: const TextStyle(
+                              color: Colors.green,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            recognizer: TapGestureRecognizer()
+                              ..onTap = onTapSignIn,
+                          ),
+                        ],
                       ),
+                    ),
                     ],
                   ),
                 ),
