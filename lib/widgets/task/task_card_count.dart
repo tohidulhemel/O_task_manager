@@ -15,8 +15,8 @@ class TaskCardCount extends StatelessWidget {
     return Card(
       child: Padding(
         padding: const EdgeInsets.symmetric(
-          horizontal: 15.0,
-          vertical: 8.0,
+          horizontal: 10,
+          vertical: 8,
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -26,11 +26,14 @@ class TaskCardCount extends StatelessWidget {
               style: Theme.of(context).textTheme.titleLarge,
             ),
             const SizedBox(height: 4),
-            FittedBox(
-              fit: BoxFit.scaleDown,
-              child: Text(
-                title,
-                maxLines: 1,
+            Text(
+              title,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
               ),
             ),
           ],
