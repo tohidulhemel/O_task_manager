@@ -26,20 +26,22 @@ class TmAppBar extends StatelessWidget implements PreferredSizeWidget {
       automaticallyImplyLeading: showBackButton,
 
       title: InkWell(
-        onTap: enableProfileTap ? () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const UpdateProfileScreen(),
-            ),
-          );
-        }: null,
+        onTap: enableProfileTap
+            ? () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const UpdateProfileScreen(),
+                  ),
+                );
+              }
+            : null,
         child: Row(
           children: [
             const CircleAvatar(
               radius: 25,
               backgroundColor: Colors.white,
-              child: Icon(Icons.person, color: Colors.green, size: 30),
+              backgroundImage: AssetImage('asset/profile.jpg'),
             ),
 
             const SizedBox(width: 10),

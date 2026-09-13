@@ -3,19 +3,36 @@ import 'package:flutter/material.dart';
 class TaskCardCount extends StatelessWidget {
   final String title;
   final int count;
+
   const TaskCardCount({
-    super.key, required this.title, required this.count,
+    super.key,
+    required this.title,
+    required this.count,
   });
 
   @override
   Widget build(BuildContext context) {
     return Card(
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 15.0,vertical: 8),
+        padding: const EdgeInsets.symmetric(
+          horizontal: 15.0,
+          vertical: 8.0,
+        ),
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(count.toString(),style: Theme.of(context).textTheme.titleLarge,),
-            Text(title)
+            Text(
+              count.toString(),
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
+            const SizedBox(height: 4),
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text(
+                title,
+                maxLines: 1,
+              ),
+            ),
           ],
         ),
       ),

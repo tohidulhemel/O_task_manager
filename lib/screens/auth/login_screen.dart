@@ -1,4 +1,3 @@
-
 import 'package:task_manager/controllers/auth_controller.dart';
 import 'package:task_manager/models/api_response.dart';
 import 'package:task_manager/models/user_model.dart';
@@ -18,18 +17,14 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final TextEditingController emailController =
-      TextEditingController();
+  final TextEditingController emailController = TextEditingController();
 
-  final TextEditingController passwordController =
-      TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
 
   void onTapSignUp() {
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) => const SignUpScreen(),
-      ),
+      MaterialPageRoute(builder: (context) => const SignUpScreen()),
     );
   }
 
@@ -42,8 +37,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final double keyboardHeight =
-        MediaQuery.of(context).viewInsets.bottom;
+    final double keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
 
     final bool keyboardOpen = keyboardHeight > 0;
 
@@ -59,9 +53,7 @@ class _LoginScreenState extends State<LoginScreen> {
             left: 35,
             right: 35,
 
-            // Normal UI stays at 150.
-            // When keyboard opens, move the form upward.
-            top: keyboardOpen ? 100 : 150,
+            top: keyboardOpen ? 100 : 200,
 
             bottom: 20,
           ),
@@ -78,9 +70,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
               TextFormField(
                 controller: emailController,
-                decoration: const InputDecoration(
-                  hintText: 'Email',
-                ),
+                decoration: const InputDecoration(hintText: 'Email'),
               ),
 
               const SizedBox(height: 25),
@@ -88,12 +78,10 @@ class _LoginScreenState extends State<LoginScreen> {
               TextFormField(
                 controller: passwordController,
                 obscureText: true,
-                decoration: const InputDecoration(
-                  hintText: 'Password',
-                ),
+                decoration: const InputDecoration(hintText: 'Password'),
               ),
 
-              const SizedBox(height: 20),
+              const SizedBox(height: 25),
 
               FilledButton(
                 onPressed: () async {
@@ -102,16 +90,13 @@ class _LoginScreenState extends State<LoginScreen> {
                       passwordController.text.isEmpty) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
-                        content: Text(
-                          'Please enter email and password',
-                        ),
+                        content: Text('Please enter email and password'),
                       ),
                     );
                     return;
                   }
 
-                  final ApiResponse response =
-                      await ApiCaller.postRequest(
+                  final ApiResponse response = await ApiCaller.postRequest(
                     url: TMUrls.LoginURL,
                     body: {
                       "email": emailController.text.trim(),
@@ -124,41 +109,32 @@ class _LoginScreenState extends State<LoginScreen> {
                       response.responseData['data'],
                     );
 
-                    String token =
-                        response.responseData['token'];
+                    String token = response.responseData['token'];
 
-                    await AuthController.saveUserData(
-                      model,
-                      token,
-                    );
+                    await AuthController.saveUserData(model, token);
 
                     if (!mounted) return;
 
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
-                        builder: (context) =>
-                            const MainNavScreen(),
+                        builder: (context) => const MainNavScreen(),
                       ),
                     );
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text(
-                          response.responseData['message'] ??
-                              'Login failed',
+                          response.responseData['message'] ?? 'Login failed',
                         ),
                       ),
                     );
                   }
                 },
-                child: const Icon(
-                  Icons.arrow_forward_ios_sharp,
-                  size: 20,
-                ),
+                child: const Icon(Icons.arrow_forward_ios_sharp, size: 20),
               ),
 
-              const SizedBox(height: 0),
+              const SizedBox(height: 25),
 
               // This section is allowed to take the remaining space.
               Expanded(
@@ -170,9 +146,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         onPressed: () {},
                         child: const Text(
                           'Forget password..?',
-                          style: TextStyle(
-                            color: Colors.grey,
-                          ),
+                          style: TextStyle(color: Colors.grey),
                         ),
                       ),
 

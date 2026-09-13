@@ -192,7 +192,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   onPressed: onTapSignUP,
                   child: const Icon(
                     Icons.arrow_forward_ios_sharp,
-                    size: 20,
+                    size: 25,
                   ),
                 ),
 
