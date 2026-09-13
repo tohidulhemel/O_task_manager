@@ -1,3 +1,4 @@
+
 import 'package:task_manager/models/api_response.dart';
 import 'package:task_manager/screens/auth/login_screen.dart';
 import 'package:task_manager/services/api_caller.dart';
@@ -14,35 +15,64 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
-  TextEditingController emailController = TextEditingController();
-  TextEditingController firstNameController = TextEditingController();
-  TextEditingController lastNameController = TextEditingController();
-  TextEditingController mobileController = TextEditingController();
-  TextEditingController passwordController = TextEditingController();
+  final TextEditingController emailController =
+      TextEditingController();
+
+  final TextEditingController firstNameController =
+      TextEditingController();
+
+  final TextEditingController lastNameController =
+      TextEditingController();
+
+  final TextEditingController mobileController =
+      TextEditingController();
+
+  final TextEditingController passwordController =
+      TextEditingController();
+
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
   Future<void> onTapSignUP() async {
-    final ApiResponse response = await ApiCaller.postRequest(
+    if (!formKey.currentState!.validate()) {
+      return;
+    }
+
+    final ApiResponse response =
+        await ApiCaller.postRequest(
       url: TMUrls.SignUpURL,
       body: {
-        "email": emailController.text,
-        "firstName": firstNameController.text,
-        "lastName": lastNameController.text,
-        "mobile": mobileController.text,
+        "email": emailController.text.trim(),
+        "firstName": firstNameController.text.trim(),
+        "lastName": lastNameController.text.trim(),
+        "mobile": mobileController.text.trim(),
         "password": passwordController.text,
       },
     );
 
     if (response.isSuccess) {
+      if (!mounted) return;
+
       Navigator.pushReplacement(
-        // ignore: use_build_context_synchronously
         context,
-        MaterialPageRoute(builder: (context) => LoginScreen()),
+        MaterialPageRoute(
+          builder: (context) => const LoginScreen(),
+        ),
+      );
+    } else {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            response.responseData['message'] ??
+                'Sign up failed',
+          ),
+        ),
       );
     }
   }
 
-void onTapSignIn() {
+  void onTapSignIn() {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
@@ -51,75 +81,124 @@ void onTapSignIn() {
     );
   }
 
-
+  @override
+  void dispose() {
+    emailController.dispose();
+    firstNameController.dispose();
+    lastNameController.dispose();
+    mobileController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
+    final bool keyboardOpen =
+        MediaQuery.of(context).viewInsets.bottom > 0;
+
     return Scaffold(
+      resizeToAvoidBottomInset: true,
+
       body: ScreenBG(
         child: Padding(
-          padding: const EdgeInsets.all(35.0),
+          padding: const EdgeInsets.symmetric(
+            horizontal: 35.0,
+          ),
           child: Form(
             key: formKey,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-
               children: [
-                SizedBox(height: 150),
+                SizedBox(
+                  height: keyboardOpen ? 50 : 150,
+                ),
+
                 Text(
                   'Join with us',
-                  style: Theme.of(context).textTheme.titleLarge,
+                  style: Theme.of(context)
+                      .textTheme
+                      .titleLarge,
                 ),
-                SizedBox(height: 25),
+
+                SizedBox(
+                  height: keyboardOpen ? 10 : 20,
+                ),
+
                 TextFormField(
                   controller: emailController,
-                  decoration: InputDecoration(hintText: 'Email'),
-
+                  decoration: const InputDecoration(
+                    hintText: 'Email',
+                  ),
                   validator: (value) {
-                    if (value == null || value.isEmpty) {
+                    if (value == null ||
+                        value.trim().isEmpty) {
                       return 'Please Enter email';
-                    } else {
-                      return null;
                     }
+
+                    return null;
                   },
                 ),
-                SizedBox(height: 25),
+
+                SizedBox(
+                  height: keyboardOpen ? 8 : 10,
+                ),
+
                 TextFormField(
                   controller: firstNameController,
-                  decoration: InputDecoration(hintText: 'First Name'),
+                  decoration: const InputDecoration(
+                    hintText: 'First Name',
+                  ),
                 ),
-                SizedBox(height: 25),
+
+                SizedBox(
+                  height: keyboardOpen ? 8 : 10,
+                ),
+
                 TextFormField(
                   controller: lastNameController,
-                
-                  decoration: InputDecoration(hintText: 'Last name'),
+                  decoration: const InputDecoration(
+                    hintText: 'Last name',
+                  ),
                 ),
-                SizedBox(height: 25),
+
+                SizedBox(
+                  height: keyboardOpen ? 8 : 10,
+                ),
+
                 TextFormField(
                   controller: mobileController,
-                  decoration: InputDecoration(hintText: 'Mobile'),
+                  decoration: const InputDecoration(
+                    hintText: 'Mobile',
+                  ),
                 ),
-                SizedBox(height: 25),
+
+                SizedBox(
+                  height: keyboardOpen ? 8 : 10,
+                ),
+
                 TextFormField(
                   controller: passwordController,
                   obscureText: true,
-                  decoration: InputDecoration(hintText: 'Password'),
+                  decoration: const InputDecoration(
+                    hintText: 'Password',
+                  ),
                 ),
 
-                SizedBox(height: 20),
+                SizedBox(
+                  height: keyboardOpen ? 12 : 15,
+                ),
 
                 FilledButton(
-                  onPressed: () {
-                    onTapSignUP();
-                  },
-                  child: Icon(Icons.arrow_forward_ios_sharp, size: 20),
+                  onPressed: onTapSignUP,
+                  child: const Icon(
+                    Icons.arrow_forward_ios_sharp,
+                    size: 20,
+                  ),
                 ),
 
-                SizedBox(height: 70),
-                Center(
-                  child: Column(
-                    children: [
-                     RichText(
+                Expanded(
+                  child: Center(
+                    child: RichText(
                       text: TextSpan(
                         text: "Already have an account ?",
                         style: const TextStyle(
@@ -133,13 +212,13 @@ void onTapSignIn() {
                               color: Colors.green,
                               fontWeight: FontWeight.bold,
                             ),
-                            recognizer: TapGestureRecognizer()
-                              ..onTap = onTapSignIn,
+                            recognizer:
+                                TapGestureRecognizer()
+                                  ..onTap = onTapSignIn,
                           ),
                         ],
                       ),
                     ),
-                    ],
                   ),
                 ),
               ],

@@ -1,6 +1,6 @@
 import 'package:task_manager/database/task_database.dart';
 import 'package:flutter/material.dart';
-
+import 'package:task_manager/widgets/common/tm_appbar.dart';
 import '../../models/task.dart';
 
 class TaskHomePage extends StatefulWidget {
@@ -52,8 +52,8 @@ class _TaskHomePageState extends State<TaskHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Todo app'), backgroundColor: Colors.orange),
-
+      appBar: const TmAppBar( ),
+ 
       body: Column(
         children: [
           Row(

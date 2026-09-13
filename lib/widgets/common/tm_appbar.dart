@@ -1,59 +1,97 @@
-import 'package:task_manager/controllers/auth_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:task_manager/controllers/auth_controller.dart';
+import 'package:task_manager/screens/auth/login_screen.dart';
+import 'package:task_manager/screens/profile/update_profile_screen.dart';
 
-import '../../screens/profile/update_profile_screen.dart';
+class TmAppBar extends StatelessWidget implements PreferredSizeWidget {
+  final bool showBackButton;
+  final bool showLogout;
+  final bool enableProfileTap;
 
-class TmAppBar extends StatelessWidget implements PreferredSize {
-  const TmAppBar({super.key});
+  const TmAppBar({
+    super.key,
+    this.showBackButton = false,
+    this.showLogout = false,
+    this.enableProfileTap = true,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final user = AuthController.userData;
+
     return AppBar(
       backgroundColor: Colors.green,
+
+      // Back button appears on the left
+      automaticallyImplyLeading: showBackButton,
+
       title: InkWell(
-        onTap: () {
+        onTap: enableProfileTap ? () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => UpdateProfileScreen()),
+            MaterialPageRoute(
+              builder: (context) => const UpdateProfileScreen(),
+            ),
           );
-        },
+        }: null,
         child: Row(
           children: [
-            CircleAvatar(
+            const CircleAvatar(
               radius: 25,
-              backgroundImage: NetworkImage(
-                'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQrN3fMD9X1_p5b6lRSCGcpDtH9BcgEOsEZLg&s',
-              ),
+              backgroundColor: Colors.white,
+              child: Icon(Icons.person, color: Colors.green, size: 30),
             ),
-            SizedBox(width: 10),
+
+            const SizedBox(width: 10),
+
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '${AuthController.userData?.firstName}  ${AuthController.userData?.lastName}',
-                  style: Theme.of(
-                    context,
-                  ).textTheme.titleSmall!.copyWith(color: Colors.white),
+                  '${user?.firstName ?? ''} ${user?.lastName ?? ''}',
+                  style: Theme.of(context).textTheme.titleSmall!.copyWith(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 Text(
-                  AuthController.userData!.email.toString(),
+                  user?.email ?? '',
                   style: Theme.of(
                     context,
-                  ).textTheme.titleSmall!.copyWith(color: Colors.white),
+                  ).textTheme.bodySmall!.copyWith(color: Colors.white),
                 ),
               ],
             ),
           ],
         ),
       ),
+
+      // Logout appears only when showLogout = true
+      actions: showLogout
+          ? [
+              IconButton(
+                onPressed: () async {
+                  await AuthController.cleanUserData();
+
+                  if (!context.mounted) return;
+
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const LoginScreen(),
+                    ),
+                    (route) => false,
+                  );
+                },
+                icon: const Icon(Icons.logout, color: Colors.white),
+                tooltip: 'Logout',
+              ),
+              const SizedBox(width: 8),
+            ]
+          : null,
     );
   }
 
   @override
-  // TODO: implement child
-  Widget get child => throw UnimplementedError();
-
-  @override
-  // TODO: implement preferredSize
-  Size get preferredSize => Size.fromHeight(kToolbarHeight);
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 }

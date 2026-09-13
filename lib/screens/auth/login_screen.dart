@@ -1,3 +1,4 @@
+
 import 'package:task_manager/controllers/auth_controller.dart';
 import 'package:task_manager/models/api_response.dart';
 import 'package:task_manager/models/user_model.dart';
@@ -17,132 +18,186 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  TextEditingController emailController = TextEditingController();
-  TextEditingController passwordController = TextEditingController();
+  final TextEditingController emailController =
+      TextEditingController();
+
+  final TextEditingController passwordController =
+      TextEditingController();
+
   void onTapSignUp() {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => SignUpScreen()),
+      MaterialPageRoute(
+        builder: (context) => const SignUpScreen(),
+      ),
     );
   }
 
   @override
+  void dispose() {
+    emailController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final double keyboardHeight =
+        MediaQuery.of(context).viewInsets.bottom;
+
+    final bool keyboardOpen = keyboardHeight > 0;
+
     return Scaffold(
+      resizeToAvoidBottomInset: true,
+
       body: ScreenBG(
-        child: Padding(
-          padding: const EdgeInsets.all(35.0),
+        child: AnimatedPadding(
+          duration: const Duration(milliseconds: 250),
+          curve: Curves.easeOut,
+
+          padding: EdgeInsets.only(
+            left: 35,
+            right: 35,
+
+            // Normal UI stays at 150.
+            // When keyboard opens, move the form upward.
+            top: keyboardOpen ? 100 : 150,
+
+            bottom: 20,
+          ),
+
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-
             children: [
-              SizedBox(height: 150),
               Text(
                 'Get Started with',
                 style: Theme.of(context).textTheme.titleLarge,
               ),
-              SizedBox(height: 25),
+
+              const SizedBox(height: 25),
+
               TextFormField(
                 controller: emailController,
-                decoration: InputDecoration(hintText: 'Email'),
+                decoration: const InputDecoration(
+                  hintText: 'Email',
+                ),
               ),
-              SizedBox(height: 25),
+
+              const SizedBox(height: 25),
+
               TextFormField(
                 controller: passwordController,
                 obscureText: true,
-                decoration: InputDecoration(hintText: 'Password'),
+                decoration: const InputDecoration(
+                  hintText: 'Password',
+                ),
               ),
 
-              SizedBox(height: 20), 
+              const SizedBox(height: 20),
 
-FilledButton(
-  onPressed: () async {
-    // Check empty fields first
-    if (emailController.text.trim().isEmpty ||
-        passwordController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please enter email and password'),
-        ),
-      );
-      return;
-    }
-
-    final ApiResponse response = await ApiCaller.postRequest(
-      url: TMUrls.LoginURL,
-      body: {
-        "email": emailController.text.trim(),
-        "password": passwordController.text,
-      },
-    );
-
-    if (response.isSuccess) {
-      UserModel model = UserModel.fromJson(
-        response.responseData['data'],
-      );
-
-      String token = response.responseData['token'];
-
-      await AuthController.saveUserData(model, token);
-
-      if (!mounted) return;
-
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const MainNavScreen(),
-        ),
-      );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            response.responseData['message'] ?? 'Login failed',
-          ),
-        ),
-      );
-    }
-  },
-  child: const Icon(
-    Icons.arrow_forward_ios_sharp,
-    size: 20,
-  ),
-),
-
-
-              SizedBox(height: 70),
-              Center(
-                child: Column(
-                  children: [
-                    TextButton(
-                      onPressed: () {},
-                      child: Text(
-                        'Forget password..?',
-                        style: TextStyle(color: Colors.grey),
-                      ),
-                    ),
-
-                    RichText(
-                      text: TextSpan(
-                        text: "Don't have an account ?",
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.w500,
+              FilledButton(
+                onPressed: () async {
+                  // Check empty fields first
+                  if (emailController.text.trim().isEmpty ||
+                      passwordController.text.isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text(
+                          'Please enter email and password',
                         ),
-                        children: [
-                          TextSpan(
-                            text: ' Sign up',
-                            style: TextStyle(
-                              color: Colors.green,
-                              fontWeight: FontWeight.bold,
-                            ),
-                            recognizer: TapGestureRecognizer()
-                              ..onTap = onTapSignUp,
-                          ),
-                        ],
                       ),
-                    ),
-                  ],
+                    );
+                    return;
+                  }
+
+                  final ApiResponse response =
+                      await ApiCaller.postRequest(
+                    url: TMUrls.LoginURL,
+                    body: {
+                      "email": emailController.text.trim(),
+                      "password": passwordController.text,
+                    },
+                  );
+
+                  if (response.isSuccess) {
+                    UserModel model = UserModel.fromJson(
+                      response.responseData['data'],
+                    );
+
+                    String token =
+                        response.responseData['token'];
+
+                    await AuthController.saveUserData(
+                      model,
+                      token,
+                    );
+
+                    if (!mounted) return;
+
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            const MainNavScreen(),
+                      ),
+                    );
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          response.responseData['message'] ??
+                              'Login failed',
+                        ),
+                      ),
+                    );
+                  }
+                },
+                child: const Icon(
+                  Icons.arrow_forward_ios_sharp,
+                  size: 20,
+                ),
+              ),
+
+              const SizedBox(height: 0),
+
+              // This section is allowed to take the remaining space.
+              Expanded(
+                child: Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      TextButton(
+                        onPressed: () {},
+                        child: const Text(
+                          'Forget password..?',
+                          style: TextStyle(
+                            color: Colors.grey,
+                          ),
+                        ),
+                      ),
+
+                      RichText(
+                        text: TextSpan(
+                          text: "Don't have an account ?",
+                          style: const TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.w500,
+                          ),
+                          children: [
+                            TextSpan(
+                              text: ' Sign up',
+                              style: const TextStyle(
+                                color: Colors.green,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              recognizer: TapGestureRecognizer()
+                                ..onTap = onTapSignUp,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ],

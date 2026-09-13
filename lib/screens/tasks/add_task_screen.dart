@@ -1,6 +1,6 @@
+
 import 'package:task_manager/models/api_response.dart';
 import 'package:task_manager/screens/navigation/main_nav_screen.dart';
-import 'package:task_manager/screens/auth/sign_up_screen.dart';
 import 'package:task_manager/services/api_caller.dart';
 import 'package:task_manager/core/constants/urls.dart';
 import 'package:task_manager/widgets/common/screen_bg.dart';
@@ -15,64 +15,115 @@ class AddNewTaskScreen extends StatefulWidget {
 }
 
 class _AddNewTaskScreenState extends State<AddNewTaskScreen> {
-  TextEditingController titleController = TextEditingController();
-  TextEditingController descriptionController = TextEditingController();
-  void onTapSignUp() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => SignUpScreen()),
-    );
+  final TextEditingController titleController = TextEditingController();
+  final TextEditingController descriptionController =
+      TextEditingController();
+
+  @override
+  void dispose() {
+    titleController.dispose();
+    descriptionController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final bool keyboardOpen =
+        MediaQuery.of(context).viewInsets.bottom > 0;
+
     return Scaffold(
-      appBar: TmAppBar(),
+      resizeToAvoidBottomInset: true,
+
+      appBar: const TmAppBar(
+        showBackButton: true,
+        enableProfileTap: false,
+      ),
+
       body: ScreenBG(
         child: Padding(
-          padding: const EdgeInsets.all(35.0),
+          padding: const EdgeInsets.symmetric(horizontal: 35.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-
             children: [
-              SizedBox(height: 150),
+              SizedBox(
+                height: keyboardOpen ? 25 : 150,
+              ),
+
               Text(
                 'Add new Task',
                 style: Theme.of(context).textTheme.titleLarge,
               ),
-              SizedBox(height: 25),
+
+              const SizedBox(height: 25),
+
               TextFormField(
                 controller: titleController,
-                decoration: InputDecoration(hintText: 'Title'),
-              ),
-              SizedBox(height: 25),
-              TextFormField(
-                controller: descriptionController,
-                maxLines: 6,
-                decoration: InputDecoration(hintText: 'Description'),
+                decoration: const InputDecoration(
+                  hintText: 'Title',
+                ),
               ),
 
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
+
+              TextFormField(
+                controller: descriptionController,
+                maxLines: keyboardOpen ? 3 : 6,
+                decoration: const InputDecoration(
+                  hintText: 'Description',
+                ),
+              ),
+
+              const SizedBox(height: 20),
 
               FilledButton(
                 onPressed: () async {
-                  final ApiResponse response = await ApiCaller.postRequest(
+                  if (titleController.text.trim().isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text(
+                          'Please enter a task title',
+                        ),
+                      ),
+                    );
+                    return;
+                  }
+
+                  final ApiResponse response =
+                      await ApiCaller.postRequest(
                     url: TMUrls.addNewTaskURL,
                     body: {
-                      "title": titleController.text,
-                      "description": descriptionController.text,
+                      "title": titleController.text.trim(),
+                      "description":
+                          descriptionController.text.trim(),
                       "status": "New",
                     },
                   );
 
                   if (response.isSuccess) {
+                    if (!mounted) return;
+
                     Navigator.pushReplacement(
                       context,
-                      MaterialPageRoute(builder: (context) => MainNavScreen()),
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            const MainNavScreen(),
+                      ),
+                    );
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          response.responseData['message'] ??
+                              'Failed to add task',
+                        ),
+                      ),
                     );
                   }
                 },
-                child: Icon(Icons.arrow_forward_ios_sharp, size: 20),
+                child: const Icon(
+                  Icons.arrow_forward_ios_sharp,
+                  size: 20,
+                ),
               ),
             ],
           ),

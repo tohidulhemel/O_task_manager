@@ -1,7 +1,6 @@
 import 'package:task_manager/controllers/auth_controller.dart';
 import 'package:task_manager/models/api_response.dart';
 import 'package:task_manager/models/user_model.dart';
-import 'package:task_manager/screens/navigation/main_nav_screen.dart';
 import 'package:task_manager/services/api_caller.dart';
 import 'package:task_manager/core/constants/urls.dart';
 import 'package:task_manager/widgets/common/screen_bg.dart';
@@ -50,13 +49,10 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
         mobile: mobileController.text,
       );
 
-      AuthController.updateUserData(model);
-      setState(() {});
+      await AuthController.updateUserData(model);
+      if (!mounted) return;
+      Navigator.pop(context);
 
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => MainNavScreen()),
-      );
     }
   }
 
@@ -76,67 +72,70 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: TmAppBar(),
-      body: ScreenBG(
-        child: Padding(
-          padding: const EdgeInsets.all(35.0),
-          child: Form(
-            key: formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-
-              children: [
-                SizedBox(height: 100),
-                Text(
-                  'Update profile',
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
-                SizedBox(height: 25),
-                TextFormField(
-                  controller: emailController,
-                  decoration: InputDecoration(hintText: 'Email'),
-
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please Enter email';
-                    } else {
-                      return null;
-                    }
-                  },
-                ),
-                SizedBox(height: 25),
-                TextFormField(
-                  controller: firstNameController,
-                  decoration: InputDecoration(hintText: 'First Name'),
-                ),
-                SizedBox(height: 25),
-                TextFormField(
-                  controller: lastNameController,
-                  decoration: InputDecoration(hintText: 'Last name'),
-                ),
-                SizedBox(height: 25),
-                TextFormField(
-                  controller: mobileController,
-                  decoration: InputDecoration(hintText: 'Mobile'),
-                ),
-                SizedBox(height: 25),
-                TextFormField(
-                  controller: passwordController,
-                  obscureText: true,
-                  decoration: InputDecoration(hintText: 'Password'),
-                ),
-
-                SizedBox(height: 20),
-
-                FilledButton(
-                  onPressed: () {
-                    updateProfile();
-                  },
-                  child: Icon(Icons.arrow_forward_ios_sharp, size: 20),
-                ),
-
-                SizedBox(height: 70),
-              ],
+      resizeToAvoidBottomInset: true,
+      appBar: const TmAppBar(showBackButton: true, showLogout: true, enableProfileTap: false,),
+      body: SingleChildScrollView(
+        child: ScreenBG(
+          child: Padding(
+            padding: const EdgeInsets.all(35.0),
+            child: Form(
+              key: formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+        
+                children: [
+                  SizedBox(height: 100),
+                  Text(
+                    'Update profile',
+                    style: Theme.of(context).textTheme.titleLarge,
+                  ),
+                  SizedBox(height: 25),
+                  TextFormField(
+                    controller: emailController,
+                    decoration: InputDecoration(hintText: 'Email'),
+        
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please Enter email';
+                      } else {
+                        return null;
+                      }
+                    },
+                  ),
+                  SizedBox(height: 25),
+                  TextFormField(
+                    controller: firstNameController,
+                    decoration: InputDecoration(hintText: 'First Name'),
+                  ),
+                  SizedBox(height: 25),
+                  TextFormField(
+                    controller: lastNameController,
+                    decoration: InputDecoration(hintText: 'Last name'),
+                  ),
+                  SizedBox(height: 25),
+                  TextFormField(
+                    controller: mobileController,
+                    decoration: InputDecoration(hintText: 'Mobile'),
+                  ),
+                  SizedBox(height: 25),
+                  TextFormField(
+                    controller: passwordController,
+                    obscureText: true,
+                    decoration: InputDecoration(hintText: 'Password'),
+                  ),
+        
+                  SizedBox(height: 20),
+        
+                  FilledButton(
+                    onPressed: () {
+                      updateProfile();
+                    },
+                    child: Icon(Icons.arrow_forward_ios_sharp, size: 20),
+                  ),
+        
+                  SizedBox(height: 70),
+                ],
+              ),
             ),
           ),
         ),
